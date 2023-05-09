@@ -21,7 +21,7 @@ class Questionnaire(SQLModel, table=True):
 class Question(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     text: str = Field(max_length=100)
-    weight: float = Field(default=1.0)
+    weight: Optional[float] = Field(default=1.0)
     questionnaire_id: int = Field(foreign_key="questionnaire.id")
     questionnaire: Questionnaire = Relationship(back_populates="question")
     answers: List["Answer"] = Relationship(back_populates="question")
