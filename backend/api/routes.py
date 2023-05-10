@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from models.questionnaire import Questionnaire
-from schemas.questionnaire import QuestionnaireCreate
-from core.database import get_session
+from backend.models.questionnaire import Questionnaire
+from backend.schemas.questionnaire import QuestionnaireCreate
+from backend.core.database import get_session
 from sqlmodel import Session
 
 router = APIRouter()
