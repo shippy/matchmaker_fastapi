@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:matchmaker_fastapi}/database.db",
+            "name": "Matchmaker SQLite"
+        }
+    ]
+}
