@@ -14,7 +14,7 @@ class Questionnaire(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     title: str = Field(max_length=100)
     user_id: int = Field(foreign_key="user.id")
-    user: User = Relationship(back_populates="questionnaire")
+    user: User = Relationship(back_populates="questionnaires")
     questions: List["Question"] = Relationship(back_populates="questionnaire")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
 
@@ -23,7 +23,7 @@ class Question(SQLModel, table=True):
     text: str = Field(max_length=100)
     weight: Optional[float] = Field(default=1.0)
     questionnaire_id: int = Field(foreign_key="questionnaire.id")
-    questionnaire: Questionnaire = Relationship(back_populates="question")
+    questionnaire: Questionnaire = Relationship(back_populates="questions")
     answers: List["Answer"] = Relationship(back_populates="question")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
 
@@ -33,7 +33,7 @@ class Answer(SQLModel, table=True):
     value: int = Field(default=0)
     explanation: str = Field()
     question_id: int = Field(foreign_key="question.id")
-    question: Question = Relationship(back_populates="answer")
+    question: Question = Relationship(back_populates="answers")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
 
 class Respondent(SQLModel, table=True):
@@ -45,9 +45,9 @@ class Respondent(SQLModel, table=True):
 class Response(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     respondent_id: int = Field(foreign_key="respondent.id")
-    respondent: Respondent = Relationship(back_populates="response")
+    respondent: Respondent = Relationship(back_populates="responses")
     answer_id: int = Field(foreign_key="answer.id")
-    answer: Answer = Relationship(back_populates="answer")
+    # answer: Answer = Relationship(back_populates="answers")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
 
 if __name__ == "__main__":
