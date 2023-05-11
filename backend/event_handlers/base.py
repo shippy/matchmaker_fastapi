@@ -1,3 +1,4 @@
+from sqlmodel import SQLModel
 from typing import Any, Mapping
 
 
@@ -12,5 +13,5 @@ class EventHandlerBase:
 
         return decorator
 
-    def handle_event(self, message: Mapping[str, Any]):
+    def handle_event(self, message: Mapping[str, Any]) -> SQLModel:
         raise NotImplementedError("Subclasses must implement this method")
