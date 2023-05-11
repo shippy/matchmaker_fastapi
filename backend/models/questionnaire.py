@@ -10,22 +10,32 @@ class User(SQLModel, table=True):
     questionnaires: List["Questionnaire"] = Relationship(back_populates="user")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
 
-class Questionnaire(SQLModel, table=True):
-    id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
+class QuestionnaireBase(SQLModel):
     title: str = Field(max_length=100)
     user_id: int = Field(foreign_key="user.id")
-    user: User = Relationship(back_populates="questionnaires")
-    questions: List["Question"] = Relationship(back_populates="questionnaire")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
 
-class Question(SQLModel, table=True):
+class Questionnaire(QuestionnaireBase, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
+    user: User = Relationship(back_populates="questionnaires")
+    questions: List["Question"] = Relationship(back_populates="questionnaire")
+
+class QuestionnaireWithQuestions(QuestionnaireBase, table=False):
+    questions: List["QuestionWithAnswers"] = []
+
+class QuestionBase(SQLModel):
     text: str = Field(max_length=100)
     weight: Optional[float] = Field(default=1.0)
     questionnaire_id: int = Field(foreign_key="questionnaire.id")
+    created_at: Optional[datetime] = Field(default_factory=datetime.now)
+
+class Question(QuestionBase, table=True):
+    id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     questionnaire: Questionnaire = Relationship(back_populates="questions")
     answers: List["Answer"] = Relationship(back_populates="question")
-    created_at: Optional[datetime] = Field(default_factory=datetime.now)
+
+class QuestionWithAnswers(QuestionBase):
+    answers: List["Answer"] = []
 
 class Answer(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
@@ -49,6 +59,11 @@ class Response(SQLModel, table=True):
     answer_id: int = Field(foreign_key="answer.id")
     # answer: Answer = Relationship(back_populates="answers")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
+
+QuestionnaireWithQuestions.update_forward_refs()
+QuestionWithAnswers.update_forward_refs()
+# Question.update_forward_refs()
+Answer.update_forward_refs()
 
 if __name__ == "__main__":
     sqlite_file_name = "database.db"
