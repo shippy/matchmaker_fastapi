@@ -11,6 +11,6 @@ router = APIRouter()
 def dispatch_event(topic: str, message: dict):
     handler = EventHandlerBase.handlers.get(topic)
     if handler:
-        handler.handle_event(message)
+        return handler.handle_event(message)
     else:
         print(f"No handler found for topic {topic}")

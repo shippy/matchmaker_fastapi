@@ -1,4 +1,5 @@
 from backend.event_handlers.base import EventHandlerBase
+from sqlmodel import create_engine, Session
 from typing import Any, Mapping
 
 from backend.models.questionnaire import User
@@ -8,7 +9,14 @@ from backend.core.database import get_session
 class CreateUserHandler(EventHandlerBase):
     def handle_event(self, message: Mapping[str, Any]):
         try:
-            u = User(**message)
-            print(f"Handling create_user event: {u}")
+            engine = create_engine("sqlite:///database.db")
+            with Session(engine) as session:
+                u = User(**message)
+                session.add(u)
+                session.commit()
+                session.refresh(u)
+                return u
+
         except Exception as e:
             print(f"Error creating user: {e}")
+            return None

@@ -6,7 +6,7 @@ from pydantic import EmailStr
 class User(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     name: str = Field()
-    email: EmailStr = Field()
+    email: EmailStr = Field(unique=True)
     questionnaires: List["Questionnaire"] = Relationship(back_populates="user")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
 

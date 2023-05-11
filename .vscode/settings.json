@@ -6,5 +6,6 @@
             "database": "${workspaceFolder:matchmaker_fastapi}/database.db",
             "name": "Matchmaker SQLite"
         }
-    ]
+    ],
+    "sqltools.useNodeRuntime": true
 }

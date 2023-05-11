@@ -1,4 +1,5 @@
 SQLModel ~= 0.0.8
+sqlalchemy==1.4.35 # https://github.com/tiangolo/sqlmodel/issues/383#issuecomment-1193373160
 FastAPI[all] ~= 0.95.1
 alembic ~= 1.10.4
 pydantic[email] ~= 1.10.7

@@ -1,6 +1,7 @@
 from sqlmodel import Session, create_engine
 
-async def get_session() -> Session:
-    engine = create_engine("sqlite:///database.db")
+engine = create_engine("sqlite:///database.db", echo=True)
+
+def get_session() -> Session:
     with Session(engine) as session:
         yield session
