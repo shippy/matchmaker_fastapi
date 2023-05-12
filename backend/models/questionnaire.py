@@ -3,10 +3,12 @@ from sqlmodel import SQLModel, Field, Relationship, create_engine
 from typing import List, Optional
 from pydantic import EmailStr
 
-class User(SQLModel, table=True):
-    id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
+class UserBase(SQLModel, table=False):
     name: str = Field()
     email: EmailStr = Field(unique=True)
+
+class User(UserBase, table=True):
+    id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     questionnaires: List["Questionnaire"] = Relationship(back_populates="user")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
     deleted_at: Optional[datetime] = Field(default=None)
@@ -49,6 +51,7 @@ class Answer(SQLModel, table=True):
     question: Question = Relationship(back_populates="answers")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
     deleted_at: Optional[datetime] = Field(default=None)
+    responses: List["Response"] = Relationship(back_populates="answers")
 
 class Respondent(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
@@ -57,14 +60,22 @@ class Respondent(SQLModel, table=True):
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
     deleted_at: Optional[datetime] = Field(default=None)
 
-class Response(SQLModel, table=True):
+class ResponseBase(SQLModel, table=False):
+    pass
+
+class Response(ResponseBase, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     respondent_id: int = Field(foreign_key="respondent.id")
     respondent: Respondent = Relationship(back_populates="responses")
     answer_id: int = Field(foreign_key="answer.id")
-    # answer: Answer = Relationship(back_populates="answers")
+    answers: List[Answer] = Relationship(back_populates="responses")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
     deleted_at: Optional[datetime] = Field(default=None)
+
+
+# class ResponseWithQuestions(ResponseBase, table=False):
+#     answer: "AnswerWithQuestion"
+
 
 QuestionnaireWithQuestions.update_forward_refs()
 QuestionWithAnswers.update_forward_refs()

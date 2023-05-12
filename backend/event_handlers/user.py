@@ -7,7 +7,7 @@ from backend.core.database import get_session
 
 @EventHandlerBase.register_handler("create_user")
 class CreateUserHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]):
+    def handle_event(self, message: Mapping[str, Any], session: Session) -> User:
         try:
             engine = create_engine("sqlite:///database.db")
             with Session(engine) as session:
@@ -18,5 +18,6 @@ class CreateUserHandler(EventHandlerBase):
                 return u
 
         except Exception as e:
+            # TODO: Raise an actual error/return 404?
             print(f"Error creating user: {e}")
             return None

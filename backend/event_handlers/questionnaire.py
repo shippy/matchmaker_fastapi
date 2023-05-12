@@ -93,8 +93,25 @@ class CreateRespondentHandler(EventHandlerBase):
 @EventHandlerBase.register_handler("create_response")
 class CreateResponseHandler(EventHandlerBase):
     def handle_event(self, message: Mapping[str, Any], session: Session) -> Response:
-        respondent = session.get(Respondent, message.pop("respondent_id"))
-        answer = session.get(Answer, message.pop("answer_id"))
-        response = Response(**message, respondent=respondent, answer=answer)
+        try:
+            respondent = session.get(Respondent, message.pop("respondent_id"))
+        except KeyError:
+            respondent = Respondent()
+        # answer = session.get(Answer, message.pop("answer_id"))
+        response = Response(**message, respondent=respondent)
         return _save_and_return_refreshed(session, response)
-            
+
+@EventHandlerBase.register_handler("update_response")
+class UpdateResponseHandler(EventHandlerBase):
+    def handle_event(self, message: Mapping[str, Any], session: Session) -> Response:
+        r = session.get(Response, message.pop("id"))
+        for key, value in message.items():
+            setattr(r, key, value)
+        return _save_and_return_refreshed(session, r)
+    
+@EventHandlerBase.register_handler("delete_response")
+class DeleteResponseHandler(EventHandlerBase):
+    def handle_event(self, message: Mapping[str, Any], session: Session) -> Response:
+        r = session.get(Response, message.pop("id"))
+        r.deleted_at = datetime.now()
+        return _save_and_return_refreshed(session, r)
