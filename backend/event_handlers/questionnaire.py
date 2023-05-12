@@ -1,106 +1,102 @@
 from backend.event_handlers.base import EventHandlerBase
-from backend.core.database import engine
-from sqlmodel import Session
+from backend.core.database import engine, get_session
+from datetime import datetime
+from fastapi import Depends
+from sqlmodel import Session, SQLModel
 from typing import Any, Mapping
 
 from backend.models.questionnaire import User, Questionnaire, Question, Answer, Respondent, Response
 
+def _save_and_return_refreshed(session: Session, obj: SQLModel) -> SQLModel:
+    session.add(obj)
+    session.commit()
+    session.refresh(obj)
+    return obj
+
 @EventHandlerBase.register_handler("create_questionnaire")
 class CreateQuestionnaireHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Questionnaire:
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Questionnaire:
         # TODO: Verify that the user passed in is the current user
-        with Session(engine) as session:
-            user = session.get(User, message.pop("user_id"))
-            q = Questionnaire(**message, user=user)
-            session.add(q)
-            session.commit()
-            session.refresh(q)
-            print(f"Handled create_questionnaire event: {q}")
-            return q
+        user = session.get(User, message.pop("user_id"))
+        q = Questionnaire(**message, user=user)
+        return _save_and_return_refreshed(session, q)
 
 @EventHandlerBase.register_handler("update_questionnaire")
 class UpdateQuestionnaireHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Questionnaire:
-        print("Handling update_questionnaire event")
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Questionnaire:
+        q = session.get(Questionnaire, message.pop("id"))
+        for key, value in message.items():
+            setattr(q, key, value)
+        return _save_and_return_refreshed(session, q)
 
 @EventHandlerBase.register_handler("delete_questionnaire")
 class DeleteQuestionnaireHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]):
-        print("Handling delete_questionnaire event")
-
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Questionnaire:
+        q = session.get(Questionnaire, message.pop("id"))
+        q.deleted_at = datetime.now()
+        return _save_and_return_refreshed(session, q)
 
 @EventHandlerBase.register_handler("create_question")
 class CreateQuestionHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Question:
-        with Session(engine) as session:
-            questionnaire = session.get(Questionnaire, message.pop("questionnaire_id"))
-            user = session.get(User, message.pop("user_id"))
-            # TODO: Verify that this is current user
-            q = Question(**message, questionnaire=questionnaire, user=user)
-
-            session.add(q)
-            session.commit()
-            session.refresh(q)
-
-            return q
-
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Question:
+        questionnaire = session.get(Questionnaire, message.pop("questionnaire_id"))
+        user = session.get(User, message.pop("user_id"))
+        # TODO: Verify that this is current user
+        q = Question(**message, questionnaire=questionnaire, user=user)
+        return _save_and_return_refreshed(session, q)
+    
 @EventHandlerBase.register_handler("update_question")
 class UpdateQuestionHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Question:
-        print("Handling update_question event")
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Question:
+        q = session.get(Question, message.pop("id"))
+        for key, value in message.items():
+            setattr(q, key, value)
+        return _save_and_return_refreshed(session, q)
 
 @EventHandlerBase.register_handler("delete_question")
 class DeleteQuestionHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]):
-        print("Handling delete_question event")
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)):
+        q = session.get(Question, message.pop("id"))
+        q.deleted_at = datetime.now()
+        return _save_and_return_refreshed(session, q)
 
 @EventHandlerBase.register_handler("create_answer")
 class CreateAnswerHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Answer:
-        with Session(engine) as session:
-            question = session.get(Question, message.pop("question_id"))
-            user = session.get(User, message.pop("user_id"))
-            # TODO: Verify that this is current user
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Answer:
+        question = session.get(Question, message.pop("question_id"))
+        user = session.get(User, message.pop("user_id"))
+        # TODO: Verify that this is current user
 
-            a = Answer(**message, question=question, user=user)
-            session.add(a)
-            session.commit()
-            session.refresh(a)
-
-            return a
-        
+        a = Answer(**message, question=question, user=user)
+        return _save_and_return_refreshed(session, a)
+            
 @EventHandlerBase.register_handler("update_answer")
 class UpdateAnswerHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Answer:
-        print("Handling update_answer event")
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Answer:
+        a = session.get(Answer, message.pop("id"))
+        for key, value in message.items():
+            setattr(a, key, value)
+        return _save_and_return_refreshed(session, a)
 
 @EventHandlerBase.register_handler("delete_answer")
 class DeleteAnswerHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]):
-        print("Handling delete_answer event")
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Answer:
+        a = session.get(Answer, message.pop("id"))
+        a.deleted_at = datetime.now()
+        return _save_and_return_refreshed(session, a)
 
 @EventHandlerBase.register_handler("create_respondent")
 class CreateRespondentHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Respondent:
-        with Session(engine) as session:
-            questionnaire = session.get(Questionnaire, message.pop("questionnaire_id"))
-            respondent = Respondent()
-            session.add(respondent)
-            session.commit()
-            session.refresh(respondent)
-
-            return respondent
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Respondent:
+        questionnaire = session.get(Questionnaire, message.pop("questionnaire_id"))
+        respondent = Respondent()
+        return _save_and_return_refreshed(session, respondent)
         
 @EventHandlerBase.register_handler("create_response")
 class CreateResponseHandler(EventHandlerBase):
-    def handle_event(self, message: Mapping[str, Any]) -> Response:
-        with Session(engine) as session:
-            respondent = session.get(Respondent, message.pop("respondent_id"))
-            answer = session.get(Answer, message.pop("answer_id"))
-            response = Response(**message, respondent=respondent, answer=answer)
-            session.add(response)
-            session.commit()
-            session.refresh(response)
-
-            return response
+    def handle_event(self, message: Mapping[str, Any], session: Session = Depends(get_session)) -> Response:
+        respondent = session.get(Respondent, message.pop("respondent_id"))
+        answer = session.get(Answer, message.pop("answer_id"))
+        response = Response(**message, respondent=respondent, answer=answer)
+        return _save_and_return_refreshed(session, response)
             
