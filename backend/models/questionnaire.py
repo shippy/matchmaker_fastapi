@@ -57,6 +57,7 @@ class Respondent(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None, nullable=False)
     email: Optional[EmailStr] = Field()
     responses: List["Response"] = Relationship(back_populates="respondent")
+    user_id: Optional[int] = Field(foreign_key="user.id")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
     deleted_at: Optional[datetime] = Field(default=None)
 
