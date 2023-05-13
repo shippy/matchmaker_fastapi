@@ -129,7 +129,7 @@ class DeleteAnswerHandler(EventHandlerBase):
 class CreateRespondentHandler(EventHandlerBase):
     def handle_event(self, message: Dict[str, Any], session: Session) -> Respondent:
         questionnaire = session.get(Questionnaire, message.pop("questionnaire_id"))
-        respondent = Respondent()
+        respondent = Respondent(**message)
         return _save_and_return_refreshed(session, respondent)
 
 
@@ -139,7 +139,7 @@ class CreateResponseHandler(EventHandlerBase):
         try:
             respondent = _get_object_by_id(Respondent, message.pop("respondent_id"), session)
         except KeyError:
-            respondent = Respondent()
+            respondent = Respondent(email=None, user_id=None)  # TODO: Check if User logged in
         # answer = session.get(Answer, message.pop("answer_id"))
         response = Response(**message, respondent=respondent)
         return _save_and_return_refreshed(session, response)
