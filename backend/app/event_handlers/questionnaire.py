@@ -1,10 +1,10 @@
-from backend.event_handlers.base import EventHandlerBase
+from app.event_handlers.base import EventHandlerBase
 from datetime import datetime
 from sqlmodel import Session, SQLModel
 from typing import Any, Dict, Mapping, Type, TypeVar, Union
 from fastapi import HTTPException, status
 
-from backend.models.questionnaire import (
+from app.models.questionnaire import (
     User,
     Questionnaire,
     Question,
@@ -12,7 +12,7 @@ from backend.models.questionnaire import (
     Respondent,
     Response,
 )
-from backend.core.utils import (
+from app.core.utils import (
     save_and_return_refreshed,
     get_object_by_id,
     get_object_owner,

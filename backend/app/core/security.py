@@ -4,14 +4,14 @@ from typing import Any, Optional, Union
 from jose import jwt
 from passlib.context import CryptContext
 
-from backend.core.config import settings
+from app.core.config import settings
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import select
 
-from backend.core.database import Session, get_session
-from backend.models.questionnaire import User, Questionnaire, Question, Answer
+from app.core.database import Session, get_session
+from app.models.questionnaire import User, Questionnaire, Question, Answer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

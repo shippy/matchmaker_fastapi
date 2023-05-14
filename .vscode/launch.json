@@ -9,8 +9,9 @@
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
+            "cwd": "${workspaceFolder}/backend",
             "args": [
-                "backend.main:app",
+                "app.main:app",
                 "--reload"
             ],
             "jinja": true,

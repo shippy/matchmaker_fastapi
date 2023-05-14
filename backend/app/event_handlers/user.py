@@ -1,12 +1,12 @@
-from backend.event_handlers.base import EventHandlerBase
+from app.event_handlers.base import EventHandlerBase
 from fastapi import HTTPException, status
 from sqlmodel import SQLModel, create_engine, Session
 from typing import Any, Mapping
 
-from backend.models.questionnaire import User, UserBase
-from backend.core.database import get_session
-from backend.core.utils import get_object_by_id, save_and_return_refreshed
-from backend.core.security import get_password_hash
+from app.models.questionnaire import User, UserBase
+from app.core.database import get_session
+from app.core.utils import get_object_by_id, save_and_return_refreshed
+from app.core.security import get_password_hash
 
 @EventHandlerBase.register_handler("create_user")
 class CreateUserHandler(EventHandlerBase):

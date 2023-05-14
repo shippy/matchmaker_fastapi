@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
-from backend.event_handlers.base import EventHandlerBase
-from backend.core.database import get_session
-from backend.core.security import get_current_user
-from backend.models.questionnaire import User
+from app.event_handlers.base import EventHandlerBase
+from app.core.database import get_session
+from app.core.security import get_current_user
+from app.models.questionnaire import User
 
 # Import your event handler subclasses to ensure they get registered
-import backend.event_handlers.questionnaire
-import backend.event_handlers.user
+import app.event_handlers.questionnaire
+import app.event_handlers.user
 
 router = APIRouter()
 

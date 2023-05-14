@@ -2,9 +2,9 @@ from datetime import timedelta
 from fastapi import Depends, APIRouter, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Mapping
-from backend.core.security import create_access_token, verify_password
-from backend.models.questionnaire import User
-from backend.core.database import Session, get_session
+from app.core.security import create_access_token, verify_password
+from app.models.questionnaire import User
+from app.core.database import Session, get_session
 
 router = APIRouter()
 

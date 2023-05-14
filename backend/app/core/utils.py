@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from typing import Type, TypeVar
 from sqlmodel import Session, SQLModel
-from backend.models.questionnaire import Questionnaire, Question, Answer, Response, User
+from app.models.questionnaire import Questionnaire, Question, Answer, Response, User
 
 # Accept SQLModel and its subclasses as a type
 SQLModelChild = TypeVar("SQLModelChild", bound=SQLModel)

@@ -86,6 +86,6 @@ QuestionWithAnswers.update_forward_refs()
 Answer.update_forward_refs()
 
 if __name__ == "__main__":
-    from backend.core.database import engine
+    from app.core.database import engine
 
     SQLModel.metadata.create_all(engine)

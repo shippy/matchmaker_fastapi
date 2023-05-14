@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends
-from backend.api.questionnaires import router as questionnaire_router
-from backend.api.events import router as event_router
-from backend.api.users import router as user_router
-from backend.models.questionnaire import User, Questionnaire, Question, Answer, Respondent, Response
-from backend.core.database import engine
+from app.api.questionnaires import router as questionnaire_router
+from app.api.events import router as event_router
+from app.api.users import router as user_router
+from app.models.questionnaire import User, Questionnaire, Question, Answer, Respondent, Response
+from app.core.database import engine
 from sqlmodel import Session, SQLModel, create_engine, select
 from typing import List
 
