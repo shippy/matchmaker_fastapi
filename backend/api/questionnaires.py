@@ -6,9 +6,11 @@ from backend.models.questionnaire import (
     QuestionnaireWithQuestions,
     Respondent,
     Response,
+    User,
 )
 from backend.schemas.questionnaire import QuestionnaireCreate
 from backend.core.database import get_session
+from backend.core.security import get_current_user
 from sqlmodel import Session, SQLModel, select
 from typing import Sequence
 
@@ -30,7 +32,9 @@ def get_questionnaire(questionnaire_id: int, session: Session = Depends(get_sess
 
 @router.get("/questionnaire/{questionnaire_id}/respondents")
 def get_questionnaire_respondents(
-    questionnaire_id: int, session: Session = Depends(get_session)
+    questionnaire_id: int,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
 ):  # -> Sequence[Respondent]:
     questionnaire = session.get(Questionnaire, questionnaire_id)
     if questionnaire is None:
@@ -51,7 +55,10 @@ def get_questionnaire_respondents(
 
 @router.get("/questionnaire/{questionnaire_id}/respondent/{respondent_id}")
 def get_respondent_responses(
-    questionnaire_id: int, respondent_id: int, session: Session = Depends(get_session)
+    questionnaire_id: int,
+    respondent_id: int,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
 ):  # -> Sequence[Response]:
     questionnaire = session.get(Questionnaire, questionnaire_id)
     if questionnaire is None:
@@ -65,7 +72,7 @@ def get_respondent_responses(
             Response.id,
             Question.text,
             Question.weight,
-            Answer.text.label("answer_text"),
+            Answer.text.label("answer_text"),  # type: ignore
             Answer.value,
         )
         .select_from(Respondent)

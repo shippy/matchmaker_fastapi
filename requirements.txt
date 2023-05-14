@@ -3,4 +3,7 @@ sqlalchemy==1.4.35 # https://github.com/tiangolo/sqlmodel/issues/383#issuecommen
 FastAPI[all] ~= 0.95.1
 alembic ~= 1.10.4
 pydantic[email] ~= 1.10.7
-pyjwt ~= 2.6.0
+python-jose[cryptography] ~= 3.3.0 
+pyjwt[crypto] ~= 2.6.0
+passlib[bcrypt] ~= 1.7.4
+python-dotenv ~= 1.0.0
