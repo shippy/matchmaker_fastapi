@@ -22,14 +22,20 @@ def upgrade() -> None:
     op.create_table('respondent',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], 'fk_respondent_linked_user'),
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('hashed_password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('access_token', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('questionnaire',
@@ -37,7 +43,8 @@ def upgrade() -> None:
     sa.Column('title', sqlmodel.sql.sqltypes.AutoString(length=100), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], 'fk_questionnaire_linked_user'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('question',
@@ -46,7 +53,8 @@ def upgrade() -> None:
     sa.Column('weight', sa.Float(), nullable=False),
     sa.Column('questionnaire_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['questionnaire_id'], ['questionnaire.id'], ),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['questionnaire_id'], ['questionnaire.id'], 'fk_question_linked_questionnaire'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('answer',
@@ -56,7 +64,8 @@ def upgrade() -> None:
     sa.Column('explanation', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('question_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['question_id'], ['question.id'], ),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['question_id'], ['question.id'], 'fk_answer_linked_question'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('response',
@@ -64,8 +73,9 @@ def upgrade() -> None:
     sa.Column('respondent_id', sa.Integer(), nullable=False),
     sa.Column('answer_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['answer_id'], ['answer.id'], ),
-    sa.ForeignKeyConstraint(['respondent_id'], ['respondent.id'], ),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['answer_id'], ['answer.id'], 'fk_response_linked_answer'),
+    sa.ForeignKeyConstraint(['respondent_id'], ['respondent.id'], 'fk_response_linked_respondent'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
