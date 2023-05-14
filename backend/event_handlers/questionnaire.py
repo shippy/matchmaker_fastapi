@@ -53,13 +53,8 @@ class CreateQuestionnaireHandler(EventHandlerBase):
     def handle_event(
         self, message: Dict[str, Any], session: Session, user: User
     ) -> Questionnaire:
-        message_user = _get_object_by_id(User, message.pop("user_id"), session)
-        if message_user != user:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can only create questionnaires for yourself",
-            )
-        q = Questionnaire(**message, user=message_user)
+        _ = message.pop("user_id", None)  # Remove user_id from message to avoid user_id injection
+        q = Questionnaire(**message, user=user)
         return _save_and_return_refreshed(session, q)
 
 
@@ -69,6 +64,12 @@ class UpdateQuestionnaireHandler(EventHandlerBase):
         self, message: Dict[str, Any], session: Session, user: User
     ) -> Questionnaire:
         q = _get_object_by_id(Questionnaire, message.pop("id"), session)
+        owner = get_object_owner(q, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only update questionnaires you own",
+            )
         for key, value in message.items():
             setattr(q, key, value)
         return _save_and_return_refreshed(session, q)
@@ -80,6 +81,12 @@ class DeleteQuestionnaireHandler(EventHandlerBase):
         self, message: Dict[str, Any], session: Session, user: User
     ) -> Questionnaire:
         q = _get_object_by_id(Questionnaire, message.pop("id"), session)
+        owner = get_object_owner(q, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only delete questionnaires you own",
+            )
         q.deleted_at = datetime.now()
         return _save_and_return_refreshed(session, q)
 
@@ -92,8 +99,12 @@ class CreateQuestionHandler(EventHandlerBase):
         questionnaire = _get_object_by_id(
             Questionnaire, message.pop("questionnaire_id"), session
         )
-        user = _get_object_by_id(User, message.pop("user_id"), session)
-        # TODO: Verify that this is current user
+        owner = get_object_owner(questionnaire, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only create questions in questionnaires you own",
+            )
         q = Question(**message, questionnaire=questionnaire)
         return _save_and_return_refreshed(session, q)
 
@@ -104,8 +115,12 @@ class UpdateQuestionHandler(EventHandlerBase):
         self, message: Dict[str, Any], session: Session, user: User
     ) -> Question:
         q = _get_object_by_id(Question, message.pop("id"), session)
-        user = _get_object_by_id(User, message.pop("user_id"), session)
-        # TODO: Verify that this is current user
+        owner = get_object_owner(q, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only update questions in questionnaires you own",
+            )
         for key, value in message.items():
             setattr(q, key, value)
         return _save_and_return_refreshed(session, q)
@@ -115,8 +130,12 @@ class UpdateQuestionHandler(EventHandlerBase):
 class DeleteQuestionHandler(EventHandlerBase):
     def handle_event(self, message: Dict[str, Any], session: Session, user: User):
         q = _get_object_by_id(Question, message.pop("id"), session)
-        user = _get_object_by_id(User, message.pop("user_id"), session)
-        # TODO: Verify that this is current user
+        owner = get_object_owner(q, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only update questions in questionnaires you own",
+            )
         q.deleted_at = datetime.now()
         return _save_and_return_refreshed(session, q)
 
@@ -127,9 +146,12 @@ class CreateAnswerHandler(EventHandlerBase):
         self, message: Dict[str, Any], session: Session, user: User
     ) -> Answer:
         question = _get_object_by_id(Question, message.pop("id"), session)
-        user = _get_object_by_id(User, message.pop("user_id"), session)
-        # TODO: Verify that this is current user / user the
-        # questionnaire & question belong to
+        owner = get_object_owner(question, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only create answers to questions in questionnaires you own",
+            )
 
         a = Answer(**message, question=question)
         return _save_and_return_refreshed(session, a)
@@ -141,8 +163,12 @@ class UpdateAnswerHandler(EventHandlerBase):
         self, message: Dict[str, Any], session: Session, user: User
     ) -> Answer:
         a = _get_object_by_id(Answer, message.pop("id"), session)
-        user = _get_object_by_id(User, message.pop("user_id"), session)
-        # TODO: Verify that this is current user
+        owner = get_object_owner(a, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only update answers to questions in questionnaires you own",
+            )
         for key, value in message.items():
             setattr(a, key, value)
         return _save_and_return_refreshed(session, a)
@@ -154,8 +180,13 @@ class DeleteAnswerHandler(EventHandlerBase):
         self, message: Dict[str, Any], session: Session, user: User
     ) -> Answer:
         a = _get_object_by_id(Answer, message.pop("id"), session)
-        user = _get_object_by_id(User, message.pop("user_id"), session)
-        # TODO: Verify that this is current user
+        owner = get_object_owner(a, session)
+        if owner != user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only update answers to questions in questionnaires you own",
+            )
+            
         a.deleted_at = datetime.now()
         return _save_and_return_refreshed(session, a)
 
