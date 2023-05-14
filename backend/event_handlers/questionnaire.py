@@ -1,7 +1,7 @@
 from backend.event_handlers.base import EventHandlerBase
 from datetime import datetime
 from sqlmodel import Session, SQLModel
-from typing import Any, Dict, Type, TypeVar, Union
+from typing import Any, Dict, Mapping, Type, TypeVar, Union
 from fastapi import HTTPException, status
 
 from backend.models.questionnaire import (
@@ -166,6 +166,24 @@ class CreateRespondentHandler(EventHandlerBase):
     def handle_event(self, message: Dict[str, Any], session: Session) -> Respondent:
         questionnaire = session.get(Questionnaire, message.pop("questionnaire_id"))
         respondent = Respondent(**message)
+        return save_and_return_refreshed(session, respondent)
+
+
+@EventHandlerBase.register_handler("update_respondent")
+class UpdateRespondentHandler(EventHandlerBase):
+    def handle_event(self, message: Dict[str, Any], session: Session) -> Respondent:
+        respondent = get_object_by_id(Respondent, message.pop("id"), session)
+        # for key, value in message.items():
+        #     setattr(respondent, key, value)
+        respondent.email = message["email"]
+        return save_and_return_refreshed(session, respondent)
+
+
+@EventHandlerBase.register_authenticated_handler("convert_respondent_to_user")
+class ConvertRespondentToUserHandler(EventHandlerBase):
+    def handle_event(self, message: Dict[str, Any], session: Session, user: User) -> SQLModel:
+        respondent = get_object_by_id(Respondent, message.pop("id"), session)
+        respondent.user_id = user.id
         return save_and_return_refreshed(session, respondent)
 
 
