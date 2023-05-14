@@ -12,9 +12,9 @@ app.include_router(questionnaire_router)
 app.include_router(event_router)
 app.include_router(user_router)
 
-@app.on_event("startup")
-async def on_startup():
-    SQLModel.metadata.create_all(engine)
+# @app.on_event("startup")
+# async def on_startup():
+#     SQLModel.metadata.create_all(engine)
 
 # Replace this with a function that listens to Redis events and calls the appropriate handler
 async def process_events():
