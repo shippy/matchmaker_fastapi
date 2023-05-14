@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from backend.api.routes import router as api_router
+from backend.api.questionnaires import router as api_router
 from backend.api.events import router as event_router
 from backend.api.users import router as user_router
 from backend.models.questionnaire import User, Questionnaire, Question, Answer, Respondent, Response
