@@ -50,7 +50,9 @@ def get_object_owner(obj: S, session: Session) -> User:
 
 @EventHandlerBase.register_authenticated_handler("create_questionnaire")
 class CreateQuestionnaireHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session, user: User) -> Questionnaire:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Questionnaire:
         message_user = _get_object_by_id(User, message.pop("user_id"), session)
         if message_user != user:
             raise HTTPException(
@@ -61,26 +63,32 @@ class CreateQuestionnaireHandler(EventHandlerBase):
         return _save_and_return_refreshed(session, q)
 
 
-@EventHandlerBase.register_handler("update_questionnaire")
+@EventHandlerBase.register_authenticated_handler("update_questionnaire")
 class UpdateQuestionnaireHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session) -> Questionnaire:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Questionnaire:
         q = _get_object_by_id(Questionnaire, message.pop("id"), session)
         for key, value in message.items():
             setattr(q, key, value)
         return _save_and_return_refreshed(session, q)
 
 
-@EventHandlerBase.register_handler("delete_questionnaire")
+@EventHandlerBase.register_authenticated_handler("delete_questionnaire")
 class DeleteQuestionnaireHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session) -> Questionnaire:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Questionnaire:
         q = _get_object_by_id(Questionnaire, message.pop("id"), session)
         q.deleted_at = datetime.now()
         return _save_and_return_refreshed(session, q)
 
 
-@EventHandlerBase.register_handler("create_question")
+@EventHandlerBase.register_authenticated_handler("create_question")
 class CreateQuestionHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session) -> Question:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Question:
         questionnaire = _get_object_by_id(
             Questionnaire, message.pop("questionnaire_id"), session
         )
@@ -90,9 +98,11 @@ class CreateQuestionHandler(EventHandlerBase):
         return _save_and_return_refreshed(session, q)
 
 
-@EventHandlerBase.register_handler("update_question")
+@EventHandlerBase.register_authenticated_handler("update_question")
 class UpdateQuestionHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session) -> Question:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Question:
         q = _get_object_by_id(Question, message.pop("id"), session)
         user = _get_object_by_id(User, message.pop("user_id"), session)
         # TODO: Verify that this is current user
@@ -101,9 +111,9 @@ class UpdateQuestionHandler(EventHandlerBase):
         return _save_and_return_refreshed(session, q)
 
 
-@EventHandlerBase.register_handler("delete_question")
+@EventHandlerBase.register_authenticated_handler("delete_question")
 class DeleteQuestionHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session):
+    def handle_event(self, message: Dict[str, Any], session: Session, user: User):
         q = _get_object_by_id(Question, message.pop("id"), session)
         user = _get_object_by_id(User, message.pop("user_id"), session)
         # TODO: Verify that this is current user
@@ -111,9 +121,11 @@ class DeleteQuestionHandler(EventHandlerBase):
         return _save_and_return_refreshed(session, q)
 
 
-@EventHandlerBase.register_handler("create_answer")
+@EventHandlerBase.register_authenticated_handler("create_answer")
 class CreateAnswerHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session) -> Answer:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Answer:
         question = _get_object_by_id(Question, message.pop("id"), session)
         user = _get_object_by_id(User, message.pop("user_id"), session)
         # TODO: Verify that this is current user / user the
@@ -123,9 +135,11 @@ class CreateAnswerHandler(EventHandlerBase):
         return _save_and_return_refreshed(session, a)
 
 
-@EventHandlerBase.register_handler("update_answer")
+@EventHandlerBase.register_authenticated_handler("update_answer")
 class UpdateAnswerHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session) -> Answer:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Answer:
         a = _get_object_by_id(Answer, message.pop("id"), session)
         user = _get_object_by_id(User, message.pop("user_id"), session)
         # TODO: Verify that this is current user
@@ -134,9 +148,11 @@ class UpdateAnswerHandler(EventHandlerBase):
         return _save_and_return_refreshed(session, a)
 
 
-@EventHandlerBase.register_handler("delete_answer")
+@EventHandlerBase.register_authenticated_handler("delete_answer")
 class DeleteAnswerHandler(EventHandlerBase):
-    def handle_event(self, message: Dict[str, Any], session: Session) -> Answer:
+    def handle_event(
+        self, message: Dict[str, Any], session: Session, user: User
+    ) -> Answer:
         a = _get_object_by_id(Answer, message.pop("id"), session)
         user = _get_object_by_id(User, message.pop("user_id"), session)
         # TODO: Verify that this is current user
