@@ -65,7 +65,7 @@ def get_respondent_responses(
             Response.id,
             Question.text,
             Question.weight,
-            Answer.text.label("answer_text"),
+            Answer.text.label("answer_text"), # type: ignore
             Answer.value,
         )
         .select_from(Respondent)
