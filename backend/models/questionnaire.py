@@ -12,6 +12,7 @@ class User(UserBase, table=True):
     questionnaires: List["Questionnaire"] = Relationship(back_populates="user")
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
     deleted_at: Optional[datetime] = Field(default=None)
+    access_token: Optional[str] = Field(default=None)
 
 class QuestionnaireBase(SQLModel):
     title: str = Field(max_length=100)

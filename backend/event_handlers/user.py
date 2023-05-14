@@ -1,9 +1,11 @@
 from backend.event_handlers.base import EventHandlerBase
+from fastapi import HTTPException, status
 from sqlmodel import create_engine, Session
 from typing import Any, Mapping
 
 from backend.models.questionnaire import User
 from backend.core.database import get_session
+
 
 @EventHandlerBase.register_handler("create_user")
 class CreateUserHandler(EventHandlerBase):
@@ -19,5 +21,7 @@ class CreateUserHandler(EventHandlerBase):
 
         except Exception as e:
             # TODO: Raise an actual error/return 404?
-            print(f"Error creating user: {e}")
-            return None
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Error creating user: {e}",
+            )
