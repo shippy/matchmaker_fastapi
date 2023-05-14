@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import EmailStr
 
 class UserBase(SQLModel, table=False):
-    name: str = Field()
+    name: str = Field(...)
     email: EmailStr = Field(unique=True)
 
 class User(UserBase, table=True):
@@ -13,6 +13,7 @@ class User(UserBase, table=True):
     created_at: Optional[datetime] = Field(default_factory=datetime.now)
     deleted_at: Optional[datetime] = Field(default=None)
     access_token: Optional[str] = Field(default=None)
+    hashed_password: str = Field(...)
 
 class QuestionnaireBase(SQLModel):
     title: str = Field(max_length=100)
@@ -85,9 +86,6 @@ QuestionWithAnswers.update_forward_refs()
 Answer.update_forward_refs()
 
 if __name__ == "__main__":
-    sqlite_file_name = "database.db"
-    sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-    engine = create_engine(sqlite_url, echo=True)
+    from backend.core.database import engine
 
     SQLModel.metadata.create_all(engine)
