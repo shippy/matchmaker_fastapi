@@ -16,6 +16,13 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
+    },
+    // Create a view for a specific questionnaire ID retrieved from 
+    // the backend at /api/questionnaire/:id.
+    {
+      path: '/questionnaire/:id',
+      name: 'questionnaire',
+      component: () => import('../views/QuestionnaireView.vue')
     }
   ]
 })
