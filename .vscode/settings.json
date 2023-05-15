@@ -3,7 +3,7 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "database": "${workspaceFolder:matchmaker_fastapi}/database.db",
+            "database": "${workspaceFolder:matchmaker_fastapi}/backend/database.db",
             "name": "Matchmaker SQLite"
         }
     ],
