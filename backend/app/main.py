@@ -7,7 +7,12 @@ from app.core.database import engine
 from sqlmodel import Session, SQLModel, create_engine, select
 from typing import List
 
-app = FastAPI()
+# app = FastAPI(root_path="/api")
+app = FastAPI(
+    docs_url="/docs",
+    openapi_url="/openapi.json",
+    redoc_url=None,
+)
 app.include_router(questionnaire_router)
 app.include_router(event_router)
 app.include_router(user_router)
