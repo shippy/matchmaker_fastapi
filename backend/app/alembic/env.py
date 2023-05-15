@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+import os
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -18,6 +19,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from models.questionnaire import *
+
 # target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata
 
@@ -25,6 +27,18 @@ target_metadata = SQLModel.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+# Interpolate environment variables into the alembic.ini file
+# (courtesy of https://stackoverflow.com/a/55190497/2114580)
+section = config.config_ini_section
+config.set_section_option(
+    section, "POSTGRES_USER", os.environ.get("POSTGRES_USER", "set_me_in_dotenv")
+)
+config.set_section_option(
+    section,
+    "POSTGRES_PASSWORD",
+    os.environ.get("POSTGRES_PASSWORD", "set_me_in_dotenv"),
+)
 
 
 def run_migrations_offline() -> None:
@@ -65,9 +79,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

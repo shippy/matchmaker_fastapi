@@ -6,6 +6,9 @@ services:
     build:
       context: ./backend
       dockerfile: ./Dockerfile
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
     ports:
       - 8000:8000
     depends_on:
