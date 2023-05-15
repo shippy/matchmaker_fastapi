@@ -5,6 +5,15 @@
             "driver": "SQLite",
             "database": "${workspaceFolder:matchmaker_fastapi}/backend/database.db",
             "name": "Matchmaker SQLite"
+        },
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "Matchmaker (PG)",
+            "database": "postgres",
+            "username": "postgres"
         }
     ],
     "sqltools.useNodeRuntime": true,
