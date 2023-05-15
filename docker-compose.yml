@@ -8,6 +8,9 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 8000:8000
+    depends_on:
+      - database
+      - redis
 
   frontend:
     image: matchmaker_vue
@@ -15,7 +18,9 @@ services:
       context: ./frontend
       dockerfile: ./Dockerfile
     ports:
-      - 3000:3000
+      - 80:80
+    depends_on:
+      - backend
 
   database:
     image: postgres:15.3
