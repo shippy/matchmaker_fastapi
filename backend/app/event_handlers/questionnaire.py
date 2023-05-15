@@ -190,15 +190,17 @@ class ConvertRespondentToUserHandler(EventHandlerBase):
 @EventHandlerBase.register_handler("create_response")
 class CreateResponseHandler(EventHandlerBase):
     def handle_event(self, message: Dict[str, Any], session: Session) -> Response:
-        try:
-            respondent = get_object_by_id(
-                Respondent, message.pop("respondent_id"), session
-            )
-        except KeyError:
+        respondent_id = message.pop("respondent_id", None)
+        if respondent_id is not None:
+            respondent = get_object_by_id(Respondent, respondent_id, session)
+        else:
             respondent = Respondent(
                 email=None, user_id=None
             )  # TODO: Check if User logged in
         # answer = session.get(Answer, message.pop("answer_id"))
+        
+        # TODO: If there's already an answer by this respondent to this question, 
+        # modify it instead of creating a new one
         response = Response(**message, respondent=respondent)
         return save_and_return_refreshed(session, response)
 
