@@ -3,9 +3,9 @@
     <div v-if="loading">Loading...</div>
     <div v-else-if="error">{{ error }}</div>
     <div v-else-if="questionnaire">
-      <h1>{{ questionnaire.title }}</h1>
+      <h2>{{ questionnaire.title }}</h2>
       <div v-for="question in questionnaire.questions" :key="`question-${question.id}`">
-        <h2>{{ question.text }}</h2>
+        <h3>{{ question.text }}</h3>
         <ul>
           <li v-for="answer in question.answers" :key="`answer-${answer.id}`">
             {{ answer.text }}
@@ -55,7 +55,7 @@ export default defineComponent({
   },
   async created() {
     try {
-      const response = await axios.get<Questionnaire>(`/api/questionnaires/${this.$route.params.id}`)
+      const response = await axios.get<Questionnaire>(`/api/questionnaire/${this.$route.params.id}`)
       this.questionnaire = response.data
       this.loading = false
     } catch (err: unknown) {
