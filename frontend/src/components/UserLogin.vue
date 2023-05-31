@@ -1,7 +1,7 @@
 <template>
 <div>
     <h1>User Login</h1>
-    <GoogleLogin :callback="callback" />
+    <GoogleLogin :callback="googleLoginCallback" />
     <form @submit.prevent="loginUser">
     <input v-model="username" type="email" placeholder="Email" required />
     <input v-model="password" type="password" placeholder="Password" required />
@@ -14,7 +14,7 @@
 import { defineComponent } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '@/stores'
-import { decodeCredential } from 'vue3-google-login'
+import { decodeCredential, type CallbackTypes } from 'vue3-google-login'
 
 interface User {
     username: string;
@@ -24,13 +24,6 @@ interface User {
 interface TokenResponse {
     access_token: string;
     // Include other properties of the token response here
-}
-
-interface GoogleTokenResponse {
-    credential: string;
-    clientId: string;
-    client_id: string;
-    select_by: string;
 }
 
 const callback = (response: any) => {
@@ -71,10 +64,12 @@ methods: {
         console.error(err)
     }
     },
-    callback: (response: GoogleTokenResponse) => {
+    googleLoginCallback: (response: CallbackTypes.CredentialPopupResponse) => {
         // This callback will be triggered when the user selects or login to
         // his Google account from the popup
-        const userData = decodeCredential(response.credential)
+        const credential = response.credential
+        console.log("The original credential", credential)
+        const userData = decodeCredential(credential)
         console.log("Handle the userData", userData)
     }
 }
