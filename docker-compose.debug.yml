@@ -6,7 +6,47 @@ services:
     build:
       context: ./backend
       dockerfile: ./Dockerfile
-    command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m uvicorn backend.app/main:app --host 0.0.0.0 --port 8000"]
+    # command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+    command: ["sh", "-c", "python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+    volumes:
+      - ./backend:/app
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      WATCHFILES_FORCE_POLLING: true
     ports:
       - 8000:8000
       - 5678:5678
+  frontend:
+    image: matchmaker_vue
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+      target: build-stage
+    command: ["sh", "-c", "npm run dev -- --host 0.0.0.0"]
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/e2e:/app/e2e
+    ports:
+      - 80:80
+      - 5173:5173
+  
+  database:
+    image: postgres:15.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+
+volumes:
+  postgres:
