@@ -7,6 +7,9 @@ from app.core.database import engine
 from sqlmodel import Session, SQLModel, create_engine, select
 from typing import List
 
+from starlette.middleware.cors import CORSMiddleware
+
+
 # app = FastAPI(root_path="/api")
 app = FastAPI(
     docs_url="/docs",
@@ -17,6 +20,14 @@ app.include_router(questionnaire_router)
 app.include_router(event_router)
 app.include_router(user_router)
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://0.0.0.0:5173", "http://localhost:5173",],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # @app.on_event("startup")
 # async def on_startup():
 #     SQLModel.metadata.create_all(engine)

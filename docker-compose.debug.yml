@@ -31,6 +31,8 @@ services:
     ports:
       - 80:80
       - 5173:5173
+      # for HMR updates:
+      - 5174:5174
   
   database:
     image: postgres:15.3

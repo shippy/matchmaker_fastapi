@@ -11,5 +11,16 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  // set up server and HMR ports to work within a Docker container
+  server: {
+    host: "0.0.0.0",
+    port: 5173,
+    hmr: {
+      port: 5174
+    },
+    watch: {
+      usePolling: true
+    }
   }
 })
