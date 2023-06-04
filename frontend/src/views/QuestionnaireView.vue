@@ -4,14 +4,14 @@
     <div v-else-if="error">{{ error }}</div>
     <div v-else-if="questionnaire">
       <h2>{{ questionnaire.title }}</h2>
-      <div v-for="question in questionnaire.questions" :key="`question-${question.id}`">
-        <h3>{{ question.text }}</h3>
-        <ul>
-          <li v-for="answer in question.answers" :key="`answer-${answer.id}`" @click="createResponse(answer.id)">
-            {{ answer.text }}
-          </li>
-        </ul>
-      </div>
+      <FormKit type="form" v-for="question in questionnaire.questions" :key="question.id">
+        <FormKit
+          type="radio"
+          :label="question.text"
+          :name="'question_' + question.id"
+          :options="question.answers.reduce((obj, answer) => ({ ...obj, [answer.id]: answer.text }), {})"
+        />
+      </FormKit>
     </div>
   </div>
 </template>
@@ -21,6 +21,7 @@ import { defineComponent } from 'vue'
 import { type RouteLocation } from "vue-router"
 import axios from 'axios'
 import Vue from 'vue'
+// import FormKit from '@formkit/vue'
 
 declare module "@vue/runtime-core" {
   interface ComponentCustomProperties {
@@ -62,7 +63,7 @@ export default defineComponent({
   },
   async created() {
     try {
-      const response = await axios.get<Questionnaire>(`/api/questionnaire/${this.$route.params.id}`)
+      const response = await axios.get<Questionnaire>(`http://localhost:8000/questionnaire/${this.$route.params.id}`)
       this.questionnaire = response.data
       this.loading = false
     } catch (err: unknown) {
